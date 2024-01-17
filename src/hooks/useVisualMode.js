@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 
-const useVisualMode = (initialMode) => {
-  const [mode, setMode] = useState(initialMode);
+const useVisualMode = (initial) => {
+  const [history, setHistory] = useState([initial]); //Implement a way to add a new mode to the history state array(initial array)
 
   function transition(newMode) {
-    setMode(newMode);
+    setHistory((prev) => [...prev, newMode]);
   }
 
-  return { mode, transition };
+  function back() {
+    setHistory((prev) => [...prev.slice(0, prev.length - 1)]);
+  }
+
+  return { mode: history[history.length - 1], transition, back };
 };
 //before refactoring:
 // const useVisualMode = (initialMode) => {
