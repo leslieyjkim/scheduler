@@ -31,3 +31,11 @@ test('useVisualMode returns to previous mode', () => {
   act(() => result.current.back());
   expect(result.current.mode).toBe(FIRST);
 });
+
+//back limit : It should not allow the user to go back past the initial mode.(history array length is greater than or equal to 1)
+test('useVisualMode does not return to previous mode if already at initial mode', () => {
+  const { result } = renderHook(() => useVisualMode(FIRST));
+
+  act(() => result.current.back());
+  expect(result.current.mode).toBe(FIRST);
+});

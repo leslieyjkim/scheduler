@@ -8,7 +8,10 @@ const useVisualMode = (initial) => {
   }
 
   function back() {
-    setHistory((prev) => [...prev.slice(0, prev.length - 1)]);
+    // setHistory((prev) => [...prev.slice(0, prev.length - 1)]); //because of 'back limit':prevent from going back past the initial mode
+    if (history.length > 1) {
+      setHistory((prev) => [...prev.slice(0, prev.length - 1)]);
+    }
   }
 
   return { mode: history[history.length - 1], transition, back };
