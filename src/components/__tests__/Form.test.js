@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import Form from 'components/Appointment/Form';
 
 afterEach(cleanup);
@@ -8,7 +9,7 @@ describe('Form', () => {
   const interviewers = [
     {
       id: 1,
-      student: 'Sylvia Palmer',
+      name: 'Sylvia Palmer',
       avatar: 'https://i.imgur.com/LpaY82x.png',
     },
   ];
@@ -56,48 +57,63 @@ describe('Form', () => {
 
 
 //#2.
-  it('validates that the interviewer cannot be null', () => {
+  it('can successfully save after trying to submit an empty student name', () => {
     const onSave = jest.fn();
 
-    const { getByText } = render(
-      <Form
-        interviewers={interviewers}
-        onSave={onSave}
-        name='Lydia Miller-Jones'
+    const { getByText, getByPlaceholderText, queryByText } = render(
+      <Form 
+        interviewers={interviewers} 
+        onSave={onSave} 
+        interviewer={1} 
       />
     );
 
     fireEvent.click(getByText('Save'));
 
     /* 3. validation is shown */
-    expect(getByText(/please select an interviewer/i)).toBeInTheDocument();
+    expect(getByText(/student name cannot be blank/i)).toBeInTheDocument();
     /* 4. onSave is not called */
     expect(onSave).not.toHaveBeenCalled();
+
+    fireEvent.change(getByPlaceholderText('Enter Student Name'), {
+      target: { value: 'Lydia Miller-Jones' },
+    });
+
+    fireEvent.click(getByText('Save'));
+
+    expect(queryByText(/student name cannot be blank/i)).toBeNull();
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onSave).toHaveBeenCalledWith('Lydia Miller-Jones', 1);
   });
 
   //#3.
-  it('calls onSave function when the name and interviewer is defined', () => {
-    const onSave = jest.fn();
+  it('calls onCancel and resets the input field', () => {
+    const onCancel = jest.fn();
 
-    const { getByText, queryByText } = render(
+    const { getByText, getByPlaceholderText, queryByText } = render(
       <Form
         interviewers={interviewers}
-        onSave={onSave}
-        name='Lydia Miller-Jones'
-        interviewer={interviewers[0].id}
+        name='Lydia Mill-Jones'
+        onSave={jest.fn()}
+        onCancel={onCancel}
       />
     );
 //"click", which lets us access the function as fireEvent.click(). 
 //pass an argument that is the element we want to click.
     fireEvent.click(getByText('Save'));
 
+    fireEvent.change(getByPlaceholderText('Enter Student Name'), {
+      target: { value: 'Lydia Miller-Jones' },
+    });
+
+    fireEvent.click(getByText('Cancel'));
+
     /* 5. validation is not shown */
     expect(queryByText(/student name cannot be blank/i)).toBeNull();
-    expect(queryByText(/please select an interviewer/i)).toBeNull();
-    /* 6. onSave is called once*/
-    expect(onSave).toHaveBeenCalledTimes(1);
-    /* 7. onSave is called with the correct arguments */
-    expect(onSave).toHaveBeenCalledWith('Lydia Miller-Jones', 1);
+    expect(getByPlaceholderText('Enter Student Name')).toHaveValue('');
+    
+    expect(onCancel).toHaveBeenCalledTimes(1);
   });
 });
 
