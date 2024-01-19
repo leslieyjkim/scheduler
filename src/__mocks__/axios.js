@@ -79,6 +79,10 @@ export default {
     }
     return Promise.resolve({ data: {} });
   }),
+
+  //We edit the src/__mocks__/axios.js to include a put key on the exported object.
+  //The mock should return a resolved promise with the response data { status: 204, statusText: "No Content" } to match what the API sends back.
+  //Include put in the axios mock so that the tests will pass when triggering the save operation.
   put: jest.fn(url => {
     return Promise.resolve({ status: 204, statusText: "No Content" });
   }),
