@@ -1,21 +1,17 @@
-/*
-  We are rendering `<Application />` down below, so we need React.createElement
-*/
-import React from "react";
-/*
-  We import our helper functions from the react-testing-library
-  The render function allows us to render Components
-*/
-import { render, cleanup } from "@testing-library/react";
-/*
-  We import the component that we are testing
-*/
-import Application from "components/Application";
+import React from 'react';
+import { render, waitForElement, fireEvent } from '@testing-library/react';
+import Application from 'components/Application';
 
-afterEach(cleanup);
-/*
-  A test that renders a React Component
-*/
-it("renders without crashing", () => {
-  render(<Application />);
+describe('Appointment', () => {
+  it("defaults to Monday and changes the schedule when a new day is selected", () => {
+    const { getByText } = render(<Application />);
+
+    return waitForElement(() => getByText("Monday")).then(() => { //We can make our test asynchronous by returning a Promise.
+      fireEvent.click(getByText("Tuesday"));
+      expect(getByText("Leopold Silvers")).toBeInTheDocument();
+    });
+  });
 });
+
+//The waitForElement function returns a promise that resolves when the callback returns a truthy value and rejects after a time out when it cannot find the specified text. 
+//When we return a Promise from the test function, the Jest framework knows that the test isn't complete until the promise chain has resolved or rejected.
