@@ -3,15 +3,16 @@ import { render, waitForElement, fireEvent } from '@testing-library/react';
 import Application from 'components/Application';
 
 describe('Appointment', () => {
-  it("defaults to Monday and changes the schedule when a new day is selected", () => {
+  it("changes the schedule when a new day is selected", async () => {
     const { getByText } = render(<Application />);
 
-    return waitForElement(() => getByText("Monday")).then(() => { //We can make our test asynchronous by returning a Promise.
-      fireEvent.click(getByText("Tuesday"));
-      expect(getByText("Leopold Silvers")).toBeInTheDocument();
-    });
+    await waitForElement(() => getByText("Monday"));
+
+    fireEvent.click(getByText("Tuesday"));
+
+    expect(getByText("Leopold Silvers")).toBeInTheDocument();
   });
 });
-
-//The waitForElement function returns a promise that resolves when the callback returns a truthy value and rejects after a time out when it cannot find the specified text. 
-//When we return a Promise from the test function, the Jest framework knows that the test isn't complete until the promise chain has resolved or rejected.
+//switching Promise to using async and await.(not replacing, work well together)
+//The asynchronous function has been defined as one using the async keyword.
+//The Promise chain can be hidden by using the await keyword.
