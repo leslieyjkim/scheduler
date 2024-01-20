@@ -1,5 +1,16 @@
 import React from 'react';
-import { render, waitForElement, fireEvent, prettyDOM, getByText, getByPlaceholderText, getByAltText, getAllByTestId, queryByText, queryByAltText } from '@testing-library/react';
+import { 
+  render, 
+  waitForElement, 
+  fireEvent, 
+  prettyDOM, 
+  getByText, 
+  getByPlaceholderText, 
+  getByAltText, 
+  getAllByTestId, 
+  queryByText, 
+  queryByAltText 
+} from '@testing-library/react';
 import Application from 'components/Application';
 import axios from "axios";
 
@@ -14,10 +25,19 @@ describe('Application', () => {
     expect(getByText("Leopold Silvers")).toBeInTheDocument();
   });
 
-
+  //TestPlan
+  // 1. Render the Application.
+  // 2. Wait until the text "Archie Cohen" is displayed.
+  // 3. Click the "Add" button on the first empty appointment.
+  // 4. Enter the name "Lydia Miller-Jones" into the input with the placeholder "Enter Student Name".
+  // 5. Click the first interviewer in the list.
+  // 6. Click the "Save" button on that same appointment.
+  // 7. Check that the element with the text "Saving" is displayed.
+  // 8. Wait until the element with the text "Lydia Miller-Jones" is displayed.
+  // 9. Check that the DayListItem with the text "Monday" also has the text "no spots remaining".
 
   it('loads data, books an interview and reduces the spots remaining for Monday by 1', async () => {
-    const { container, debug } = render(<Application />);
+    const { container } = render(<Application />);
 
     await waitForElement(() => getByText(container, 'Archie Cohen'));
 
@@ -32,8 +52,7 @@ describe('Application', () => {
 
     fireEvent.click(getByAltText(appointment, 'Sylvia Palmer'));
     fireEvent.click(getByText(appointment, 'Save'));
-    // console.log(prettyDOM(appointment));
-    // debug();
+   
 
     expect(getByText(appointment, 'Saving')).toBeInTheDocument();
 
@@ -45,30 +64,39 @@ describe('Application', () => {
 
     expect(getByText(day, 'no spots remaining')).toBeInTheDocument();
 
-    // console.log(prettyDOM(day));
   });
+
 //cancelling
+//TestPlan
+  // 1. Render the Application.
+  // 2. Wait until the text "Archie Cohen" is displayed.
+  // 3. Click the "Delete" button on the booked appointment.
+  // 4. Check that the confirmation message is shown.
+  // 5. Click the "Confirm" button on the confirmation.
+  // 6. Check that the element with the text "Deleting" is displayed.
+  // 7. Wait until the element with the "Add" button is displayed.
+  // 8. Check that the DayListItem with the text "Monday" also has the text "2 spots remaining".
   it('loads data, cancels an interview and increases the spots remaining for Monday by 1', async () => {
     const { container } = render(<Application />);
-
+    //2
     await waitForElement(() => getByText(container, 'Archie Cohen'));
-
+    //3
     const appointment = getAllByTestId(container, 'appointment').find(
       (appointment) => queryByText(appointment, 'Archie Cohen')
     );
 
     fireEvent.click(queryByAltText(appointment, 'Delete'));
-
+    //4
     expect(
       getByText(appointment, 'Are you sure you would like to delete?')
     ).toBeInTheDocument();
-
+    //5
     fireEvent.click(queryByText(appointment, 'Confirm'));
-
+    //6
     expect(getByText(appointment, 'Deleting')).toBeInTheDocument();
-
+    //7
     await waitForElement(() => getByAltText(appointment, 'Add'));
-
+    //8
     const day = getAllByTestId(container, 'day').find((day) =>
       queryByText(day, 'Monday')
     );
@@ -111,6 +139,7 @@ describe('Application', () => {
   });
 
   //error handling when booking fails in saving
+  //We need to import the axios library into the test file so that we can access the instance and change the put mock.
   it('shows the save error when failing to save an appointment', async () => {
     axios.put.mockRejectedValueOnce();
 
@@ -135,8 +164,6 @@ describe('Application', () => {
     await waitForElement(() => getByText(appointment, 'Error'));
     expect(getByText(appointment, 'Error')).toBeInTheDocument();
 
-    // console.log(prettyDOM(appointment));
-    // debug();
 
     fireEvent.click(queryByAltText(appointment, 'Close'));
 
@@ -173,8 +200,6 @@ describe('Application', () => {
 
     expect(getByText(appointment, 'Deleting')).toBeInTheDocument();
 
-    // console.log(prettyDOM(appointment));
-    // debug();
 
     await waitForElement(() => getByText(appointment, 'Error'));
     expect(getByText(appointment, 'Error')).toBeInTheDocument();
