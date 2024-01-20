@@ -41,7 +41,7 @@ describe('Application', () => {
     const day = getAllByTestId(container, 'day').find((day) =>
       queryByText(day, 'Monday')
     );
-
+  //cancelling 
     expect(getByText(day, 'no spots remaining')).toBeInTheDocument();
 
     // console.log(prettyDOM(day));
@@ -73,6 +73,35 @@ describe('Application', () => {
     );
 
     expect(getByText(day, '2 spots remaining')).toBeInTheDocument();
+  });
+
+  //editing
+  it('loads data, edits an interview and keeps the spots remaining for Monday the same', async () => {
+    const { container } = render(<Application />);
+
+    await waitForElement(() => getByText(container, 'Archie Cohen'));
+
+    const appointment = getAllByTestId(container, 'appointment').find(
+      (appointment) => queryByText(appointment, 'Archie Cohen')
+    );
+
+    fireEvent.click(queryByAltText(appointment, 'Edit'));
+
+    fireEvent.change(getByPlaceholderText(appointment, /enter student name/i), {
+      target: { value: 'Spiderman' },
+    });
+
+    fireEvent.click(queryByText(appointment, 'Save'));
+
+    expect(getByText(appointment, 'Saving')).toBeInTheDocument();
+
+    await waitForElement(() => getByText(appointment, 'Spiderman'));
+
+    const day = getAllByTestId(container, 'day').find((day) =>
+      queryByText(day, 'Monday')
+    );
+
+    expect(getByText(day, '1 spot remaining')).toBeInTheDocument();
   });
 });
 //switching Promise to using async and await.(not replacing, work well together)
