@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, waitForElement, fireEvent, prettyDOM, getByText, getByPlaceholderText, getByAltText, getAllByTestId, queryByText, queryByAltText } from '@testing-library/react';
 import Application from 'components/Application';
+import axios from "axios";
 
 describe('Application', () => {
   it("changes the schedule when a new day is selected", async () => {
@@ -41,12 +42,12 @@ describe('Application', () => {
     const day = getAllByTestId(container, 'day').find((day) =>
       queryByText(day, 'Monday')
     );
-  //cancelling 
+
     expect(getByText(day, 'no spots remaining')).toBeInTheDocument();
 
     // console.log(prettyDOM(day));
   });
-
+//cancelling
   it('loads data, cancels an interview and increases the spots remaining for Monday by 1', async () => {
     const { container } = render(<Application />);
 
@@ -96,6 +97,54 @@ describe('Application', () => {
     expect(getByText(appointment, 'Saving')).toBeInTheDocument();
 
     await waitForElement(() => getByText(appointment, 'Spiderman'));
+
+
+    //Find the specific day node that contains the text "Monday". 
+    //Import the getAllByTestId query to search the original container for the nodes with data-testid="day".
+    //We cannot use getBy and queryBy interchangeably
+    //In this situation, we want to use queryByText because we want to have the value null returned if it doesn't find the node.
+    const day = getAllByTestId(container, 'day').find((day) =>
+      queryByText(day, 'Monday')
+    );
+
+    expect(getByText(day, '1 spot remaining')).toBeInTheDocument();
+  });
+
+  //error handling when booking fails in saving
+  it('shows the save error when failing to save an appointment', async () => {
+    axios.put.mockRejectedValueOnce();
+
+    const { container, debug } = render(<Application />);
+
+    await waitForElement(() => getByText(container, 'Archie Cohen'));
+
+    const appointments = getAllByTestId(container, 'appointment');
+    const appointment = appointments[0];
+
+    fireEvent.click(getByAltText(appointment, 'Add'));
+
+    fireEvent.change(getByPlaceholderText(appointment, /enter student name/i), {
+      target: { value: 'Lydia Miller-Jones' },
+    });
+
+    fireEvent.click(getByAltText(appointment, 'Sylvia Palmer'));
+    fireEvent.click(getByText(appointment, 'Save'));
+
+    expect(getByText(appointment, 'Saving')).toBeInTheDocument();
+
+    await waitForElement(() => getByText(appointment, 'Error'));
+    expect(getByText(appointment, 'Error')).toBeInTheDocument();
+
+    // console.log(prettyDOM(appointment));
+    // debug();
+
+    fireEvent.click(queryByAltText(appointment, 'Close'));
+
+    expect(getByText(appointment, 'Save')).toBeInTheDocument();
+
+    fireEvent.click(queryByText(appointment, 'Cancel'));
+
+    expect(getByText(container, 'Archie Cohen')).toBeInTheDocument();
 
     const day = getAllByTestId(container, 'day').find((day) =>
       queryByText(day, 'Monday')

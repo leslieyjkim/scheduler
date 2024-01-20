@@ -1,8 +1,9 @@
 import React from "react";
 import classnames from "classnames";
-
 import "components/DayListItem.scss";
 
+
+//searching a container
 export function formatSpots(number) {
   if (number === 0) return "no spots remaining";
   if (number === 1) return "1 spot remaining";
