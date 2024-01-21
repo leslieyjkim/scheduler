@@ -5,7 +5,7 @@ describe("Navigation", () => {
 
 
   //Add test:write a query to find the day that contains the text "Tuesday" and click on it
-  it('navigates to Tuesday', () => {
+  it('should navigates to Tuesday', () => {
     cy.visit('/');
 
   
