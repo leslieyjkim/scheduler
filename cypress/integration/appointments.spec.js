@@ -6,8 +6,9 @@ describe('Appointments', () => {
     cy.visit('/');
     
     cy.contains('[data-testid=day]', 'Monday');
-});
+  });
 
+  //#1.booking
   it("should book an interview", () => {
     //We need to use first because there are two Add buttons, we hide the second one because it is part of the last appointment, which we only want to display the header with the time
     cy.get('[alt=Add]').first().click();
@@ -27,4 +28,21 @@ describe('Appointments', () => {
     cy.contains('.appointment__card--show', 'Lydia Miller-Jones');
     cy.contains('.appointment__card--show', 'Sylvia Palmer');
   });
+
+
+  //#2.editing
+  it('should edit an interview', () => {
+    cy.get('[alt=Edit]').first().click({ force: true });
+
+    cy.get('[data-testid=student-name-input]').clear().type('Lydia Miller-Jones');
+    cy.get("[alt='Tori Malcolm']").click();
+
+    cy.contains('Save').click();
+
+    cy.contains('.appointment__card--show', 'Lydia Miller-Jones');
+    cy.contains('.appointment__card--show', 'Tori Malcolm');
+  });
+
+
+
 });
