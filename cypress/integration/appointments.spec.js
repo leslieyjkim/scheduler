@@ -43,6 +43,19 @@ describe('Appointments', () => {
     cy.contains('.appointment__card--show', 'Tori Malcolm');
   });
 
+  //#3.cancelling
+  it('cancels an interview', () => {
+    cy.get('[alt=Delete]').click({ force: true });
 
+    cy.contains('Confirm').click();
+    
+    //When we click the confirm button, there is a "Deleting" process indicator.
+    cy.contains('Deleting').should('exist');
+    //Then check that the "Deleting" indicator should not exist.
+    cy.contains('Deleting').should('not.exist');
+
+    //Sees that the appointment slot is empty
+    cy.contains('.appointment__card--show', 'Archie Cohen').should('not.exist');
+  });
 
 });
